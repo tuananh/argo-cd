@@ -30,9 +30,9 @@ pipeline:
     with:
       patches: tls-cipher-removed.patch
 
-  - uses: go/bump
-    with:
-      deps: github.com/cloudflare/circl@v1.3.7 golang.org/x/net@v0.23.0
+  # - uses: go/bump
+  #   with:
+  #     deps: github.com/cloudflare/circl@v1.3.7 golang.org/x/net@v0.23.0
 
   - runs: |
       cd ui
