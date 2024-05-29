@@ -38,8 +38,9 @@ jobs:
       - uses: chainguard-dev/actions/melange-build@e82b4e5ae10182af72972addcb3fedf7454621c8 # latest as of 2024-05-29
         with:
           config: .melange.yaml
-          sign-with-temporary-key: true
-          archs: x86_64,aarch64
+          sign-with-temporary-key: true # TODO change with permanent key
+          # archs: x86_64,aarch64
+          archs: x86_64
 
       - uses: chainguard-images/actions/apko-publish@70ef33423618955be903186c527e677a8bc4689b # latest as of 2024-05-29
         id: apko
