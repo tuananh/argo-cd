@@ -1,0 +1,85 @@
+contents:
+  keyring:
+    - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+  repositories:
+    - https://packages.wolfi.dev/os
+    - '@local /github/workspace/packages'
+  packages:
+    - argocd@local
+    - bash
+    - busybox
+    - git
+    - git-lfs
+    - gpg
+    - gpg-agent
+    - helm
+    - kustomize
+    - openssh-server
+    - tini
+    - tzdata
+    - wolfi-baselayout
+    - zip
+
+accounts:
+  groups:
+    - groupname: argocd
+      gid: 999
+  users:
+    - username: argocd
+      uid: 999
+      gid: 999
+  run-as: 999
+
+paths:
+  - path: /home/argocd
+    type: directory
+    permissions: 0o777
+    uid: 999
+    gid: 999
+  - path: /app
+    type: directory
+    uid: 999
+    gid: 999
+    permissions: 0o777
+  - path: /app/config
+    type: directory
+    uid: 999
+    gid: 999
+    permissions: 0o777
+  - path: /app/config/ssh
+    uid: 999
+    gid: 999
+    type: directory
+    permissions: 0o777
+  - path: /app/config/tls
+    uid: 999
+    gid: 999
+    type: directory
+    permissions: 0o777
+  - path: /app/config/gpg
+    uid: 999
+    gid: 999
+    type: directory
+    permissions: 0o777
+  - path: /app/config/gpg/source
+    uid: 999
+    gid: 999
+    type: directory
+    permissions: 0o777
+  - path: /app/config/gpg/keys
+    uid: 999
+    gid: 999
+    type: directory
+    permissions: 0o777
+
+work-dir: /home/argocd
+
+entrypoint:
+  command: /usr/local/bin/entrypoint.sh
+
+environment:
+  GNUPGHOME: /app/config/gpg/keys
+  
+archs:
+- amd64
+- arm64

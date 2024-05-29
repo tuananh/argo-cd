@@ -1,0 +1,60 @@
+# Keep is separated for now. Once done, we will merge it into release workflow
+name: Release Wolfi-based image
+
+on:
+  workflow_dispatch:
+  push:
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
+jobs:
+  build:
+    name: Build Wolfi-based image
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      packages: write
+      contents: read
+
+    steps:
+      - name: Generate snapshot date
+        id: snapshot-date
+        run: |
+          echo ::set-output name=date::$(date -u +%Y%m%d)
+          echo ::set-output name=epoch::$(date -u +%s)
+        shell: bash
+
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v2
+      
+      - run: sudo apt-get install -y qemu-user
+
+      - uses: sigstore/cosign-installer@v3.5.0
+      
+      - uses: chainguard-dev/actions/melange-build@e82b4e5ae10182af72972addcb3fedf7454621c8 # latest as of 2024-05-29
+        with:
+          config: .melange.yaml
+          sign-with-temporary-key: true
+          archs: x86_64,aarch64
+
+      - uses: chainguard-images/actions/apko-publish@70ef33423618955be903186c527e677a8bc4689b # latest as of 2024-05-29
+        id: apko
+        with:
+          config: .apko.yaml
+          tag: ghcr.io/${{ github.repository }}:wolfi-latest
+          keyring-append: /github/workspace/melange.rsa.pub
+          source-date-epoch: ${{ steps.snapshot-date.outputs.epoch }}
+
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+
+      - shell: bash
+        run: |
+          COSIGN_EXPERIMENTAL=true cosign sign ${{ steps.apko.outputs.digest }} --yes
