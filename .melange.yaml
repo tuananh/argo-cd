@@ -30,9 +30,10 @@ pipeline:
       tag: v${{package.version}}
       expected-commit: 25f7504ecc198e7d7fdc055fdb83ae50eee5edd0
 
-  - uses: patch
-    with:
-      patches: tls-cipher-removed.patch
+  # NOTE: disable all patches from Wolfi team for now. I figure Argo-cd team wants to do it themselves?
+  # - uses: patch
+  #   with:
+  #     patches: tls-cipher-removed.patch
 
   # - uses: go/bump
   #   with:
